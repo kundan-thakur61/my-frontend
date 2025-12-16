@@ -20,35 +20,28 @@ import {
 import { toast } from 'react-toastify';
 import mobileAPI from '../api/mobileAPI';
 import Loader from '../components/Loader';
-import { formatPrice, resolveImageUrl } from '../utils/helpers';
+import { formatPrice } from '../utils/helpers';
 import { createCustomOrder, createCustomPayment, verifyCustomPayment } from '../redux/slices/customSlice';
 import { FALLBACK_MOBILE_COMPANIES } from '../data/fallbackMobileCompanies';
 
 const MATERIAL_OPTIONS = [
   {
     id: 'polycarbonate',
-    label: 'Premium Polycarbonate',
-    subtitle: 'Matte, scratch resistant daily driver',
+    label: 'Glossy Metal',
+    subtitle: 'metal finish Smooth shiny look Strong & durable',
     price: 199,
     originalPrice: 399,
-    perks: ['Feather-light', 'Anti-fade UV print'],
+    
   },
   {
     id: 'tempered-glass',
-    label: 'Tempered Glass Elite',
-    subtitle: 'Glossy + camera ring + velvet inside',
+    label: 'Glossy Metal + Gel',
+    subtitle: 'Transparent layer Extra shine Design  premium',
     price: 249,
     originalPrice: 449,
-    perks: ['High-gloss finish', 'Anti-slip grip'],
+    
   },
-  {
-    id: 'magsafe-clear',
-    label: 'MagSafe Transparent',
-    subtitle: 'Crystal clear, anti-yellow MagSafe loop',
-    price: 299,
-    originalPrice: 549,
-    perks: ['Built-in magnets', 'Drop tested 3ft'],
-  },
+
 ];
 
 const FEATURE_HIGHLIGHTS = [
@@ -135,7 +128,6 @@ const CustomMobilePage = () => {
   const [selectedModel, setSelectedModel] = useState(null);
   const [selectedMaterial, setSelectedMaterial] = useState(MATERIAL_OPTIONS[0]);
   const [quantity, setQuantity] = useState(1);
-  const [specialNotes, setSpecialNotes] = useState('');
   const [imagePreview, setImagePreview] = useState('');
   const [loadingCompanies, setLoadingCompanies] = useState(true);
   const [loadingModels, setLoadingModels] = useState(false);
@@ -155,6 +147,7 @@ const CustomMobilePage = () => {
   const [orderFeedback, setOrderFeedback] = useState(null);
   const builderRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [specialNotes, setSpecialNotes] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -228,16 +221,17 @@ const CustomMobilePage = () => {
     return { total, original, savings, discount: Math.max(discount, 0) };
   }, [selectedMaterial, quantity]);
 
-  const selectedFrame = useMemo(() => {
-    if (selectedModel?.framePath) return selectedModel.framePath;
-    if (selectedModel?.images?.length) {
-      const firstImage = selectedModel.images[0];
-      if (typeof firstImage === 'string') return firstImage;
-      return resolveImageUrl(firstImage);
-    }
-    if (selectedCompany?.previewFrame) return selectedCompany.previewFrame;
-    return DEFAULT_FRAME;
-  }, [selectedModel, selectedCompany]);
+  // const selectedFrame = useMemo(() => {
+  //   // Uncomment and adjust the following if you want to use model-specific frames:
+  //   // if (selectedModel?.framePath) return selectedModel.framePath;
+  //   // if (selectedModel?.images?.length) {
+  //   //   const firstImage = selectedModel.images[0];
+  //   //   if (typeof firstImage === 'string') return firstImage;
+  //   //   return resolveImageUrl(firstImage);
+  //   // }
+  //   if (selectedCompany?.previewFrame) return selectedCompany.previewFrame;
+  //   return DEFAULT_FRAME;
+  // }, [selectedModel, selectedCompany]);
 
   const shippingReady = Boolean(
     shipping.name.trim() &&
@@ -546,7 +540,7 @@ const CustomMobilePage = () => {
               </h1>
               <p className="text-lg text-blue-100 max-w-xl">
                 Craft a one-of-a-kind mobile case with premium UV printing, MagSafe friendly materials
-                and 700+ phone models. Exactly like the Copad experience you shared.
+                and 700+ phone models. 
               </p>
               <div className="flex flex-wrap items-center gap-6 text-sm">
                 <div className="flex items-center gap-2">
@@ -558,7 +552,7 @@ const CustomMobilePage = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <FiShield className="w-5 h-5 text-green-200" />
-                  <p className="text-blue-100">Lifetime print warranty</p>
+                  
                 </div>
               </div>
               <div className="flex flex-wrap gap-4">
@@ -577,34 +571,7 @@ const CustomMobilePage = () => {
               </div>
             </div>
 
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 p-6 shadow-2xl">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
-                    <FiCamera className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm uppercase tracking-wide text-white/70">Premium Custom Case</p>
-                    <p className="text-3xl font-semibold">{formatPrice(199)}</p>
-                    <p className="text-sm text-white/80">Launch price • incl. taxes</p>
-                  </div>
-                </div>
-                <div className="aspect-[9/19] bg-white/90 rounded-3xl relative overflow-hidden shadow-xl">
-                  <div className="absolute inset-4 rounded-[32px] bg-gradient-to-br from-slate-200 to-slate-50" />
-                  <div className="absolute inset-6 rounded-[28px] bg-white flex items-center justify-center text-primary-600">
-                    Your image lives here
-                  </div>
-                </div>
-                <ul className="mt-6 space-y-2 text-sm text-white/90">
-                  <li className="flex items-center gap-2"><FiCheckCircle /> 3D sublimation print</li>
-                  <li className="flex items-center gap-2"><FiCheckCircle /> Raised camera lip</li>
-                  <li className="flex items-center gap-2"><FiCheckCircle /> Free WhatsApp preview</li>
-                </ul>
-              </div>
-              <div className="absolute -bottom-6 -right-4 bg-white text-primary-700 px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold">
-                Rs. 199.00 <span className="text-xs text-gray-500 line-through ml-2">Rs. 399.00</span>
-              </div>
-            </div>
+         
           </div>
         </div>
       </section>
@@ -622,28 +589,22 @@ const CustomMobilePage = () => {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-sm uppercase tracking-wide text-gray-500">Preview</p>
-                  <h2 className="text-2xl font-semibold text-gray-900">
-                    {selectedModel ? `${selectedModel.name} Cover` : 'Select a model'}
-                  </h2>
+                 
                 </div>
-                <span className="text-xs px-3 py-1 rounded-full bg-primary-50 text-primary-700">
-                  {selectedMaterial.label}
-                </span>
+               
               </div>
               <div className="relative mx-auto w-64 aspect-[9/19]">
-                <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-slate-100 via-white to-slate-100 border border-gray-100" />
-                <div className="absolute inset-[18px] rounded-[24px] bg-gray-200 overflow-hidden flex items-center justify-center">
+                <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-slate-100 via-white to-slate-100" />
+                <div className="absolute inset-[18px] rounded-[24px] bg-gray-200 overflow-hidden">
                   {imagePreview ? (
                     <img src={imagePreview} alt="Uploaded preview" className="w-full h-full object-cover" />
                   ) : (
-                    <p className="text-gray-500 text-sm text-center px-6">Upload a photo to preview your custom print</p>
+                    <div className="w-full h-full flex items-center justify-center px-6 text-center">
+                      <p className="text-gray-500 text-sm">Upload a photo to preview your custom print</p>
+                    </div>
                   )}
                 </div>
-                <img
-                  src={selectedFrame}
-                  alt="Phone frame"
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                />
+               
               </div>
               <p className="mt-4 text-sm text-gray-500 text-center">Kindly upload a high quality image for best results.</p>
 
@@ -661,27 +622,11 @@ const CustomMobilePage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[
-                { icon: FiZap, title: 'Printed in 12h', subtitle: 'Speedy batch runs' },
-                { icon: FiPackage, title: 'Insured shipping', subtitle: 'Free tamper proof box' },
-                { icon: FiShield, title: '1 year warranty', subtitle: 'On peeling or fade' },
-              ].map((item) => (
-                <div key={item.title} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col gap-2">
-                  <item.icon className="w-5 h-5 text-primary-600" />
-                  <p className="font-semibold text-gray-900">{item.title}</p>
-                  <p className="text-sm text-gray-500">{item.subtitle}</p>
-                </div>
-              ))}
-            </div>
+            
           </div>
 
           <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 space-y-8">
-            <div className="space-y-3">
-              <p className="text-sm uppercase tracking-wide text-gray-500">Step 1</p>
-              <h2 className="text-3xl font-semibold text-gray-900">Build your custom case</h2>
-              <p className="text-gray-600">Choose material, phone brand, model and drop your artwork. Exactly like Copad&apos;s custom builder.</p>
-            </div>
+           
 
             <div className="space-y-4">
               <p className="text-sm font-semibold text-gray-700">Material</p>
@@ -704,11 +649,11 @@ const CustomMobilePage = () => {
                       <span className="text-sm text-gray-400 line-through">{formatPrice(option.originalPrice)}</span>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
-                      {option.perks.map((perk) => (
-                        <span key={perk} className="text-xs rounded-full bg-white/80 px-2 py-1 border border-gray-200 text-gray-600">
-                          {perk}
-                        </span>
-                      ))}
+                      {/* {option.perks.map((perk) => (
+                        // <span key={perk} className="text-xs rounded-full bg-white/80 px-2 py-1 border border-gray-200 text-gray-600">
+                        //   {perk}
+                        // </span>
+                      ))} */}
                     </div>
                   </button>
                 ))}
@@ -827,9 +772,9 @@ const CustomMobilePage = () => {
 
             <div className="space-y-4">
               <div>
-                <p className="text-sm uppercase tracking-wide text-gray-500">Step 2</p>
+                {/* <p className="text-sm uppercase tracking-wide text-gray-500">Step 2</p> */}
                 <h3 className="text-xl font-semibold text-gray-900">Shipping details</h3>
-                <p className="text-sm text-gray-500">We deliver pan-India within 3-5 working days.</p>
+                <p className="text-sm text-gray-500">We deliver pan-India within 5-7 working days.</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -959,7 +904,7 @@ const CustomMobilePage = () => {
           </div>
         </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {FEATURE_HIGHLIGHTS.map((feature) => (
             <div key={feature.title} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex gap-4">
               <feature.icon className="w-10 h-10 text-primary-600" />
@@ -969,9 +914,9 @@ const CustomMobilePage = () => {
               </div>
             </div>
           ))}
-        </section>
+        </section> */}
 
-        <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+        {/* <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
             <div>
               <p className="text-sm uppercase text-gray-500">How it works</p>
@@ -995,7 +940,7 @@ const CustomMobilePage = () => {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
           <div className="text-center mb-8">

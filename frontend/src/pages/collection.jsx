@@ -214,11 +214,11 @@ const CollectionPage = () => {
     return resolved || DEFAULT_FRAME;
   }, [selectedModel, selectedCompany]);
 
-  const builderReady = Boolean(selectedImage && selectedCompany && selectedModel);
+  // const builderReady = Boolean(selectedImage && selectedCompany && selectedModel);
 
-  const scrollToGallery = () => {
-    galleryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  // const scrollToGallery = () => {
+  //   galleryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // };
 
   useEffect(() => {
     if (!galleryImages.length) {
@@ -239,19 +239,24 @@ const CollectionPage = () => {
 
   const handleArtworkSelect = (image) => {
     setSelectedImage(image);
+    if (!collection) return;
+    const rawToken = image?._id || image?.publicId || image?.url || image?.path || image?.secure_url || image?.caption;
+    const token = rawToken ? slugifyId(rawToken) : '';
+    const nextUrl = token ? `/collection/${handle}/gallery?imageId=${token}` : `/collection/${handle}/gallery`;
+    navigate(nextUrl, { state: { selectedImage: image } });
   };
 
-  const handleCompanySelect = (event) => {
-    const companyId = event.target.value;
-    const company = companies.find((item) => item._id === companyId) || null;
-    setSelectedCompany(company);
-  };
+  // const handleCompanySelect = (event) => {
+  //   const companyId = event.target.value;
+  //   const company = companies.find((item) => item._id === companyId) || null;
+  //   setSelectedCompany(company);
+  // };
 
-  const handleModelSelect = (event) => {
-    const modelId = event.target.value;
-    const model = models.find((item) => item._id === modelId) || null;
-    setSelectedModel(model);
-  };
+  // const handleModelSelect = (event) => {
+  //   const modelId = event.target.value;
+  //   const model = models.find((item) => item._id === modelId) || null;
+  //   setSelectedModel(model);
+  // };
 
   const buildCartBlueprint = () => {
     if (!collection || !selectedImage || !selectedCompany || !selectedModel) return null;
@@ -478,25 +483,25 @@ const CollectionPage = () => {
         </div>
       </div>
 
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 mt-8 grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
+      <section className="w-full px-0 mt-10">
         <div className="space-y-6">
           <div ref={galleryRef} className="bg-white rounded-4xl shadow-xl p-8">
             <p className="uppercase text-xs tracking-[0.4em] text-gray-400">Collection</p>
-            <h1 className="text-4xl font-semibold text-gray-900 mt-3">{collection.title}</h1>
-            {collection.tagline && (
+            {/* <h1 className="text-4xl font-semibold text-gray-900 mt-3">{collection.title}</h1> */}
+            {/* {collection.tagline && (
               <p className="text-lg text-gray-600 mt-3">{collection.tagline}</p>
-            )}
-            {collection.description && (
+            )} */}
+            {/* {collection.description && (
               <p className="text-gray-600 mt-4 leading-relaxed">{collection.description}</p>
-            )}
+            )} */}
 
             <div className="mt-8">
-              <div className="flex items-center justify-between mb-4">
-                <div>
+              <div className="flex items-center justify-between m-10">
+                {/* <div>
                   <p className="text-sm text-gray-500 uppercase tracking-[0.4em]">Step 1</p>
                   <h2 className="text-2xl font-semibold text-gray-900">Image board</h2>
                   <p className="text-sm text-gray-500 mt-1">Tap any artwork to move it into the builder below.</p>
-                </div>
+                </div> */}
                 {isAdmin && (
                   <label className="inline-flex items-center gap-2 px-4 py-2 rounded-full border cursor-pointer text-sm font-semibold" style={{ borderColor: accent, color: accent }}>
                     <FiUpload />
@@ -507,57 +512,92 @@ const CollectionPage = () => {
               </div>
 
               {galleryImages.length === 0 ? (
-                <div className="border border-dashed border-gray-300 rounded-3xl p-10 text-center text-gray-500">
-                  No images yet. {isAdmin ? 'Upload your first shot to bring this page to life.' : 'Please check back soon.'}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {galleryImages.map((image) => {
-                    const key = image._id || image.publicId || image.url;
-                    const tileSrc = resolveImageUrl(image.url || image.secure_url || image.path || image.publicUrl || '');
-                    const isChosen = selectedImage && ((image._id && selectedImage._id === image._id) || (!image._id && selectedImage.url === image.url));
-                    return (
-                      <button
-                        type="button"
-                        key={key}
-                        onClick={() => handleArtworkSelect(image)}
-                        className={`relative group rounded-3xl overflow-hidden shadow-sm border transition ${isChosen ? 'border-primary-500 ring-2 ring-primary-200' : 'border-gray-100 hover:border-primary-200'}`}
-                      >
-                        <img src={tileSrc} alt={image.caption || collection.title} className="h-64 w-full object-cover" loading="lazy" />
-                        {isChosen && (
-                          <span className="absolute top-4 left-4 inline-flex items-center gap-1 bg-white/90 text-primary-600 text-xs font-semibold px-3 py-1 rounded-full">
-                            <FiCheckCircle className="h-4 w-4" />
-                            Selected
-                          </span>
-                        )}
-                        {isAdmin && (
-                          <span
-                            role="button"
-                            tabIndex={0}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleRemoveImage(image._id);
-                            }}
-                            onKeyDown={(event) => {
-                              if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                handleRemoveImage(image._id);
-                              }
-                            }}
-                            className="absolute top-4 right-4 bg-white/90 rounded-full p-2 text-red-600 shadow opacity-0 group-hover:opacity-100 transition"
-                            title="Delete image"
-                          >
-                            <FiTrash2 />
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+  <div className="border border-dashed rounded-xl p-10 text-center text-gray-500">
+    No images yet. {isAdmin ? 'Upload your first shot to bring this page to life.' : 'Please check back soon.'}
+  </div>
+) : (
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
+    {galleryImages.map((image) => {
+      const key = image._id || image.publicId || image.url;
+      const tileSrc = resolveImageUrl(
+        image.url || image.secure_url || image.path || image.publicUrl || ''
+      );
+
+      const isChosen =
+        selectedImage &&
+        ((image._id && selectedImage._id === image._id) ||
+          (!image._id && selectedImage.url === image.url));
+
+      return (
+        <button
+          type="button"
+          key={key}
+          onClick={() => handleArtworkSelect(image)}
+        className={`relative group rounded-2xl overflow-hidden border transition
+    ${isChosen
+      ? 'border-primary-500 ring-2 ring-primary-200'
+      : 'border-gray-200 hover:border-primary-300'}
+  `}
+>
+  <div className="relative w-full aspect-[3/4] bg-gray-50">
+          {/* Image */}
+          <div className="absolute inset-0 flex items-center justify-center p-2">
+            <img
+              src={tileSrc}
+              alt={image.caption || collection.title}
+              className="max-w-full max-h-full object-contain"
+              loading="lazy"
+            />
+          </div>
+
+          {/* Selected badge */}
+          
+          {isChosen && (
+            <span className="absolute top-3 left-3 flex items-center gap-1 bg-white/90 text-primary-600 text-xs font-semibold px-3 py-1 rounded-full">
+              <FiCheckCircle className="h-4 w-4" />
+              Selected
+            </span>
+          )}
+         
+
+          {/* Delete button (admin only) */}
+          {isAdmin && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemoveImage(image._id);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRemoveImage(image._id);
+                }
+              }}
+              className="absolute top-3 right-3 bg-white/90 rounded-full p-2 text-red-600 shadow
+                 opacity-0 group-hover:opacity-100 transition"
+              title="Delete image"
+            >
+              <FiTrash2 />
+            </span>
+          )}
+
+
+        </div>
+        </button>
+
+      );
+    })}
+
+  </div>
+)}
+
             </div>
           </div>
+
+{/*
 
           <div className="bg-white rounded-4xl shadow-xl p-6 sm:p-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -698,6 +738,9 @@ const CollectionPage = () => {
               </div>
             </div>
           </div>
+  */}
+
+
         </div>
 
         {isAdmin && (

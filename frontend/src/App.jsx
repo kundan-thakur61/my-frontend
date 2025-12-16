@@ -35,6 +35,8 @@ import OrderSuccess from './pages/OrderSuccess';
 import Wishlist from './pages/Wishlist';
 import ThemeDetail from './pages/ThemeDetail';
 import Collection from './pages/collection.jsx';
+import GalleryImagePage from './pages/GalleryImagePage.jsx';
+
 
 
 
@@ -120,6 +122,11 @@ function App() {
         { path: 'themes/:slug', element: <ThemeDetail /> },
         { path: 'theme', element: <Navigate to="/themes" replace /> },
         { path: 'collection/:handle', element: <Collection /> },
+        { path: 'collection/:handle/gallery', element: <GalleryImagePage /> },
+
+        
+
+
         { path: 'cart', element: <Cart /> },
         { path: 'login', element: <Login /> },
         { path: 'signup', element: <Signup /> },

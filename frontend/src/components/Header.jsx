@@ -39,7 +39,6 @@ const Header = () => {
             </div>
             <span className="text-xl font-bold text-gray-900">COVER GHAR</span>
           </Link>
-
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-gray-700 hover:text-primary-600 font-medium  m-2">

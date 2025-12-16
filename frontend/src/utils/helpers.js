@@ -1,10 +1,26 @@
-const PUBLIC_ASSET_PREFIXES = ['/frames/', '/payment-icons/'];
+const PUBLIC_ASSET_PREFIXES = [
+  '/frames/',
+  '/payment-icons/',
+  '/assets/',
+  '/src/',
+  '/@fs/',
+];
+
+const normalizeSlashes = (value = '') => String(value).replace(/\\/g, '/');
 
 const ensureLeadingSlash = (value = '') => (value.startsWith('/') ? value : `/${value}`);
 
+const normalizeFrontendAssetCandidate = (value = '') => {
+  if (!value) return '';
+  const sanitized = normalizeSlashes(String(value).trim()).toLowerCase();
+  const withoutLeadingSlashes = sanitized.replace(/^\/+/g, '');
+  const withoutRelativeSegments = withoutLeadingSlashes.replace(/^(\.?\.\/)+/g, '');
+  return ensureLeadingSlash(withoutRelativeSegments);
+};
+
 const isPublicFrontendAsset = (value = '') => {
   if (!value) return false;
-  const normalized = ensureLeadingSlash(String(value).toLowerCase());
+  const normalized = normalizeFrontendAssetCandidate(value);
   return PUBLIC_ASSET_PREFIXES.some((prefix) => normalized.startsWith(prefix));
 };
 
@@ -173,12 +189,13 @@ const getAssetBaseUrl = () => {
 
 const normalizeAssetPath = (raw) => {
   if (!raw) return '';
-  const value = raw.trim();
+  const value = normalizeSlashes(String(raw).trim());
   if (/^(?:https?:)?\/\//i.test(value) || value.startsWith('data:') || value.startsWith('blob:')) {
     return value;
   }
   if (isPublicFrontendAsset(value)) {
-    return buildPublicAssetUrl(value);
+    const normalized = normalizeFrontendAssetCandidate(value);
+    return buildPublicAssetUrl(normalized);
   }
   const baseUrl = getAssetBaseUrl();
   if (!baseUrl) return value;
